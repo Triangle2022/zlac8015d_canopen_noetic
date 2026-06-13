@@ -1,0 +1,18 @@
+can_interface: can0
+node_id: 1
+
+# Measure these on the actual platform.
+wheel_radius: 0.08
+wheel_separation: 0.38
+
+# EDS shows Target_velocity limits of -1000..1000.
+rpm_limit: 1000
+command_timeout: 0.5
+
+publish_encoder: true
+encoder_poll_rate: 20.0
+encoder_counts_per_rev: 4096.0
+
+auto_enable: true
+configure_velocity_mode_on_start: true
+configure_rpdo_on_start: true

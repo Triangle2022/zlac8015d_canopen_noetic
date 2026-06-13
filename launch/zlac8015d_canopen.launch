@@ -1,0 +1,10 @@
+<launch>
+  <arg name="config" default="$(find zlac8015d_canopen_noetic)/config/zlac8015d.yaml"/>
+
+  <node pkg="zlac8015d_canopen_noetic"
+        type="zlac8015d_canopen_node"
+        name="zlac8015d_canopen_node"
+        output="screen">
+    <rosparam command="load" file="$(arg config)"/>
+  </node>
+</launch>
