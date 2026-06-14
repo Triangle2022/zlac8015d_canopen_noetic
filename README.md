@@ -66,6 +66,9 @@ wheel_separation: 0.38
 rpm_limit: 1000
 command_timeout: 0.5
 
+left_motor_inverted: false
+right_motor_inverted: false
+
 publish_encoder: true
 encoder_poll_rate: 20.0
 encoder_counts_per_rev: 4096.0
@@ -85,6 +88,8 @@ configure_rpdo_on_start: true
 | `wheel_separation` | 좌/우 바퀴 중심 간 거리입니다. 회전 명령을 좌/우 속도로 나눌 때 사용합니다. 단위는 meter입니다. |
 | `rpm_limit` | 목표 RPM 제한값입니다. EDS상 `60FF` 범위가 `-1000..1000`이라 기본값은 `1000`입니다. |
 | `command_timeout` | `/cmd_vel`이 이 시간 동안 안 들어오면 목표 RPM을 0으로 보냅니다. 단위는 second입니다. |
+| `left_motor_inverted` | `true`이면 왼쪽 바퀴 목표 RPM 부호를 반전합니다. |
+| `right_motor_inverted` | `true`이면 오른쪽 바퀴 목표 RPM 부호를 반전합니다. |
 | `publish_encoder` | `true`이면 엔코더 값을 주기적으로 읽어서 publish합니다. |
 | `encoder_poll_rate` | 엔코더 SDO read 주기입니다. 기본 `20.0 Hz`입니다. |
 | `encoder_counts_per_rev` | 1회전당 엔코더 카운트입니다. 현재 사용하는 값 기준으로 `4096.0`입니다. |
@@ -102,17 +107,15 @@ angle_rad = encoder_count / encoder_counts_per_rev * 2*pi
 
 ## 추가로 필요할 수 있는 파라미터
 
-실제 로봇에 올리면 좌/우 모터 장착 방향이나 엔코더 증가 방향이 반대로 나올 수 있습니다. 그 경우 아래 파라미터를 코드에 추가하는 것이 좋습니다.
+실제 로봇에 올리면 엔코더 증가 방향이나 감속비 보정이 추가로 필요할 수 있습니다. 그 경우 아래 파라미터를 코드에 추가하는 것이 좋습니다.
 
 ```yaml
-left_motor_inverted: false
-right_motor_inverted: false
 left_encoder_inverted: false
 right_encoder_inverted: false
 gear_ratio: 1.0
 ```
 
-현재 코드에는 아직 이 반전/감속비 파라미터가 적용되어 있지 않습니다. 실제 테스트에서 한쪽 바퀴가 반대로 돌거나 엔코더 부호가 반대로 나오면 추가하면 됩니다.
+현재 코드에는 아직 엔코더 반전/감속비 파라미터가 적용되어 있지 않습니다. 실제 테스트에서 엔코더 부호가 반대로 나오거나 감속비 보정이 필요하면 추가하면 됩니다.
 
 ## Published Topics
 
@@ -273,15 +276,3 @@ rosservice call /zlac8015d_canopen_node/enable
 5. `roslaunch`로 노드를 실행합니다.
 6. `/zlac8015d/encoder_counts`가 들어오는지 확인합니다.
 7. 낮은 속도의 `/cmd_vel`을 보내 좌/우 바퀴 방향을 확인합니다.
-
-## C++와 Python 선택
-
-메인 ROS 드라이버는 C++가 좋습니다.
-
-- `/cmd_vel`을 계속 받아 CAN으로 안정적으로 보내야 합니다.
-- Linux SocketCAN API와 바로 붙기 좋습니다.
-- 장시간 실행되는 로봇 베이스 노드에 적합합니다.
-
-Python은 초기 테스트, SDO read/write 실험, 파라미터 튜닝 스크립트에 좋습니다.
-
-
