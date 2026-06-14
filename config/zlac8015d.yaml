@@ -2,8 +2,8 @@ can_interface: can0
 node_id: 1
 
 # Measure these on the actual platform.
-wheel_radius: 0.08
-wheel_separation: 0.38
+wheel_radius: 0.14
+wheel_separation: 0.393
 
 # EDS shows Target_velocity limits of -1000..1000.
 rpm_limit: 1000
