@@ -9,6 +9,9 @@ wheel_separation: 0.38
 rpm_limit: 1000
 command_timeout: 0.5
 
+left_motor_inverted: false
+right_motor_inverted: true
+
 publish_encoder: true
 encoder_poll_rate: 20.0
 encoder_counts_per_rev: 4096.0

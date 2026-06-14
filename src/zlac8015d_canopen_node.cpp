@@ -51,6 +51,8 @@ public:
     private_nh_.param<double>("wheel_separation", wheel_separation_, 0.38);
     private_nh_.param<int>("rpm_limit", rpm_limit_, 1000);
     private_nh_.param<double>("command_timeout", command_timeout_, 0.5);
+    private_nh_.param<bool>("left_motor_inverted", left_motor_inverted_, false);
+    private_nh_.param<bool>("right_motor_inverted", right_motor_inverted_, false);
     private_nh_.param<bool>("publish_encoder", publish_encoder_, true);
     private_nh_.param<double>("encoder_poll_rate", encoder_poll_rate_, 20.0);
     private_nh_.param<double>("encoder_counts_per_rev", encoder_counts_per_rev_, 4096.0);
@@ -262,8 +264,8 @@ private:
     const double left_mps = msg->linear.x - msg->angular.z * wheel_separation_ * 0.5;
     const double right_mps = msg->linear.x + msg->angular.z * wheel_separation_ * 0.5;
 
-    const std::int16_t left_rpm = mpsToRpm(left_mps);
-    const std::int16_t right_rpm = mpsToRpm(right_mps);
+    const std::int16_t left_rpm = applyMotorDirection(mpsToRpm(left_mps), left_motor_inverted_);
+    const std::int16_t right_rpm = applyMotorDirection(mpsToRpm(right_mps), right_motor_inverted_);
 
     setTargetRpm(left_rpm, right_rpm);
     last_command_time_ = ros::Time::now();
@@ -274,6 +276,11 @@ private:
     const double rpm = (mps / (2.0 * kPi * wheel_radius_)) * 60.0;
     const int rounded = static_cast<int>(std::lround(rpm));
     return static_cast<std::int16_t>(std::max(-rpm_limit_, std::min(rpm_limit_, rounded)));
+  }
+
+  std::int16_t applyMotorDirection(const std::int16_t rpm, const bool inverted) const
+  {
+    return inverted ? static_cast<std::int16_t>(-rpm) : rpm;
   }
 
   void setTargetRpm(const std::int16_t left_rpm, const std::int16_t right_rpm)
@@ -366,6 +373,8 @@ private:
   double wheel_separation_{0.38};
   int rpm_limit_{1000};
   double command_timeout_{0.5};
+  bool left_motor_inverted_{false};
+  bool right_motor_inverted_{false};
   bool publish_encoder_{true};
   double encoder_poll_rate_{20.0};
   double encoder_counts_per_rev_{4096.0};
